@@ -109,9 +109,6 @@ button{
 </div>
 
 <script>
-
-<script>
-// register service worker
 if("serviceWorker" in navigator){
  navigator.serviceWorker.register("sw.js");
 }
@@ -120,64 +117,65 @@ const grid=document.getElementById("grid");
 const fill=document.getElementById("fill");
 const percent=document.getElementById("percent");
 
-// 🔥 SET TANGGAL MULAI RAMADAN DI SINI
-// format: tahun, bulan-1, tanggal
-// contoh: Ramadan mulai 1 Maret 2026 → (2026,2,1)
-const ramadanStart = new Date(2026,2,1);
+// kalau grid tidak ketemu → hentikan supaya tidak error
+if(!grid){
+  alert("ERROR: div id='grid' tidak ditemukan di HTML");
+}
+
+// OPTIONAL: set awal Ramadan (boleh dihapus kalau tidak perlu auto hari)
+const ramadanStart = new Date(2026,1,18);
 
 function getPuasaDay(){
-  const today=new Date();
-  const diff=Math.floor((today-ramadanStart)/(1000*60*60*24))+1;
-  if(diff>=1 && diff<=30) return diff;
-  return null;
+ const today=new Date();
+ const diff=Math.floor((today-ramadanStart)/(1000*60*60*24))+1;
+ if(diff>=1 && diff<=30) return diff;
+ return null;
 }
 
 function render(){
 
-grid.innerHTML="";
-let done=0;
-let todayPuasa=getPuasaDay();
+ grid.innerHTML="";
+ let done=0;
+ let todayPuasa=getPuasaDay();
 
-for(let i=1;i<=30;i++){
- let d=document.createElement("div");
- d.className="day";
- d.textContent=i;
+ for(let i=1;i<=30;i++){
 
- // sorot hari puasa sekarang
- if(i===todayPuasa){
-   d.style.outline="3px solid #38bdf8";
-   d.style.transform="scale(1.05)";
+   let d=document.createElement("div");
+   d.className="day";
+   d.textContent=i;
+
+   // highlight puasa hari ini
+   if(i===todayPuasa){
+     d.style.outline="3px solid #38bdf8";
+   }
+
+   if(localStorage.getItem("puasa_"+i)==="true"){
+     d.classList.add("done");
+     done++;
+   }
+
+   d.onclick=()=>{
+     d.classList.toggle("done");
+     localStorage.setItem("puasa_"+i,d.classList.contains("done"));
+     render();
+   };
+
+   grid.appendChild(d);
  }
 
- if(localStorage.getItem("puasa_"+i)==="true"){
-   d.classList.add("done");
-   done++;
- }
-
- d.onclick=()=>{
-   d.classList.toggle("done");
-   localStorage.setItem("puasa_"+i,d.classList.contains("done"));
-   render();
- };
-
- grid.appendChild(d);
-}
-
-let p=Math.round(done/30*100);
-fill.style.width=p+"%";
-percent.textContent="Progress: "+p+"% ("+done+"/30 hari)";
+ let p=Math.round(done/30*100);
+ fill.style.width=p+"%";
+ percent.textContent=p+"% selesai ("+done+"/30 hari)";
 }
 
 function resetAll(){
-if(confirm("Reset semua?")){
-for(let i=1;i<=30;i++) localStorage.removeItem("puasa_"+i);
-render();
-}
+ if(confirm("Reset semua?")){
+   for(let i=1;i<=30;i++) localStorage.removeItem("puasa_"+i);
+   render();
+ }
 }
 
 render();
-</script>
-
 </script>
 
 </body>
