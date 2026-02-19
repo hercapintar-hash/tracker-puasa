@@ -3,8 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>Tracker puasa</title>
-    
+    <title>Tracker puasa</title>    
 
   </head>
     
@@ -108,7 +107,7 @@ button{
 
 </div>
 
-<script>
+ <script>
 if("serviceWorker" in navigator){
  navigator.serviceWorker.register("sw.js");
 }
@@ -117,26 +116,10 @@ const grid=document.getElementById("grid");
 const fill=document.getElementById("fill");
 const percent=document.getElementById("percent");
 
-// kalau grid tidak ketemu → hentikan supaya tidak error
-if(!grid){
-  alert("ERROR: div id='grid' tidak ditemukan di HTML");
-}
-
-// OPTIONAL: set awal Ramadan (boleh dihapus kalau tidak perlu auto hari)
-const ramadanStart = new Date(2026,1,18);
-
-function getPuasaDay(){
- const today=new Date();
- const diff=Math.floor((today-ramadanStart)/(1000*60*60*24))+1;
- if(diff>=1 && diff<=30) return diff;
- return null;
-}
-
 function render(){
 
  grid.innerHTML="";
  let done=0;
- let todayPuasa=getPuasaDay();
 
  for(let i=1;i<=30;i++){
 
@@ -144,16 +127,13 @@ function render(){
    d.className="day";
    d.textContent=i;
 
-   // highlight puasa hari ini
-   if(i===todayPuasa){
-     d.style.outline="3px solid #38bdf8";
-   }
-
+   // cek storage
    if(localStorage.getItem("puasa_"+i)==="true"){
      d.classList.add("done");
      done++;
    }
 
+   // klik toggle
    d.onclick=()=>{
      d.classList.toggle("done");
      localStorage.setItem("puasa_"+i,d.classList.contains("done"));
@@ -177,7 +157,6 @@ function resetAll(){
 
 render();
 </script>
-
 </body>
 </html>
     
